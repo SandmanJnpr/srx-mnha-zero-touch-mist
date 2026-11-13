@@ -2,8 +2,8 @@
 
 Ask one group at a time, in order A to F, with the read-only API checks of SKILL.md step 2 in between
 (A1-A2, written to `answers.json` (`mist.portal_host`, `mist.api_host`, `mist.token_file`), since
-`mist_api.py` reads them at import; then 2.1-2.2; then A3 and the group A table; B with 2.3-2.4; C with
-2.5-2.7; then D, E, F; then the snapshot 2.8). For each item
+`mist_api.py` reads them at import; then 2.1-2.2; then A3 and the group A table; B with 2.3-2.4; then
+2.5, C1-C2; E3; 2.6, C3-C4; C5; 2.7; then D, E (without E3), F; then the snapshot 2.8). For each item
 tell the user why it is needed and how to find it, offer the default if there is one, validate the
 answer, and record it in `answers.json` (field names as in `answers.example.json`). Secrets are never
 typed into the chat: the user saves each one in a local file (mode 600) and gives you the path. At the
@@ -67,11 +67,11 @@ Profile file line numbers below are 1-based positions in `additional_config_cmds
 
 ## C. Hub and overlay
 
-**C1. Overlay and hub present**
-- Ask: confirm the VPN `OrgOverlay` (hub and spoke) exists and the hub is connected with its own Hub Profile (hub role).
+**C1. Overlay present**
+- Ask: confirm the VPN `OrgOverlay` (hub and spoke) exists.
 - Why: the spoke profiles join the hub's overlay path; IOT reaches the hub site through it. The VPN must be named exactly `OrgOverlay`: the IOT network, the profiles' traffic steering path and their Additional CLI (node 1 lines 115, 116, 121 and 122, node 2 lines 105, 106, 111 and 112: `vpn_OrgOverlay`, `OrgOverlay_overlay`, `OrgOverlay_advertise`, names Mist derives from the VPN name) use it. A hub-and-spoke VPN with another name stops the build.
 - Lands in: a prerequisite; you confirm with `GET /orgs/{org_id}/vpns?limit=1000`.
-- How to find: you read it with `GET /orgs/{org_id}/vpns?limit=1000` and `GET /orgs/{org_id}/deviceprofiles?type=gateway&limit=1000` (SKILL.md steps 2.5-2.6).
+- How to find: you read it with `GET /orgs/{org_id}/vpns?limit=1000` (SKILL.md step 2.5).
 - Default: none; without it, stop (paper section 7 step 1).
 
 **C2. Hub overlay path**
@@ -82,17 +82,17 @@ Profile file line numbers below are 1-based positions in `additional_config_cmds
 - Default: `HUB-wan`, giving `HUB-wan.OrgOverlay`.
 
 **C3. Hub MAC: `<hub-MAC>`**
-- Ask: confirm the hub MAC you found.
+- Ask: confirm the hub is connected with its own Hub Profile (hub role), and confirm the hub MAC you found.
 - Why: the two DPD lines name the IKE gateway Mist generates, `wan_to_<hub-MAC>_wan`.
 - Lands in: node 1 lines 113 and 114, node 2 lines 103 and 104; `hub.hub_mac`.
-- How to find: the inventory `mac` of the one device that carries the hub profile: 12 lowercase hex digits, no separators. None, or more than one: stop. After the assign, `config_cmd` shows the same name.
+- How to find: from SKILL.md step 2.6, the inventory `mac` of the one device that carries the hub profile, and that it is connected: 12 lowercase hex digits, no separators. None, more than one, or not connected: stop. After the assign, `config_cmd` shows the same name.
 - Default: none.
 
 **C4. Hub import accepts IOT**
 - Ask: does the hub's overlay import filter accept 10.10.60.0/24?
 - Why: IOT routes to the hub over the overlay; a hub that drops them leaves no return path.
 - Lands in: `hub.import_accepts_iot`; a prerequisite on the hub, which this skill does not change.
-- How to find: you read the hub's render read-only (SKILL.md step 2.6: `GET /sites/{hub site_id}/devices/{hub device id}/config_cmd`) and show, after `redact()`, only the lines that contain `vpn_OrgOverlay protocols bgp` and ` import `, and the `policy-options policy-statement` lines of each policy they name (the tokens after ` import `, `[` and `]` removed). In this design the hub's overlay import rejected 10.255.0.0/16 orlonger and accepted the rest. The user answers from those lines; the hub's configuration is the user's.
+- How to find: you read the hub's render read-only (SKILL.md step 2.6: `GET /sites/{hub site_id}/devices/{hub device id}/config_cmd`) and show, after `redact()`, only the lines that contain both `vpn_OrgOverlay protocols bgp` and ` import `, and the `policy-options policy-statement` lines of each policy they name (the tokens after ` import `, `[` and `]` removed). In this design the hub's overlay import rejected 10.255.0.0/16 orlonger and accepted the rest. The user answers from those lines; the hub's configuration is the user's.
 - Default: none; a "no" stops the build.
 
 **C5. Hub site prefixes**
@@ -157,8 +157,8 @@ Also set in both profiles (the user confirms them with the plan): ICL on ge-0/0/
 - Default: none. Without a delegated /60 from ISP 1 this design does not apply: stop.
 
 **E3. Profile names**
-- Ask: keep the default names?
-- Why: a name that already exists in the org stops the build; the Mist UI refuses names over 32 characters or with characters other than letters, digits, `_` and `-`. On the Mist UI path the user types this exact name in the Name field of Import Profile.
+- Ask, before SKILL.md step 2.6 (its clash check uses these names): keep the default names?
+- Why: a name that already exists in the org stops the build unless SKILL.md rule 5 allows reuse (decided at step 3.3); the Mist UI refuses names over 32 characters or with characters other than letters, digits, `_` and `-`. On the Mist UI path the user types this exact name in the Name field of Import Profile.
 - Lands in: `name` of each profile; `nodes.<n>.profile_name`.
 - Default: `SZTP-SRX400-NODE1`, `SZTP-SRX400-NODE2`.
 
@@ -168,6 +168,8 @@ Also set in both profiles (the user confirms them with the plan): ICL on ge-0/0/
 - Default: two levels above `SKILL.md`.
 
 ## F. Site readiness (a yes for each; a "no" stops the build until it is a yes)
+
+Lands in (whole group): `site_readiness.*`, `t0_power_on_utc`, `t0_epoch`, `watch_start_epoch`.
 
 **F1. ISP DHCP, each node's ge-0/0/2**: an address, a default route and DNS; a 10-minute lease; no ZTP option (no option 143). ZTP uses the default route and DNS to reach redirect.juniper.net and Mist. After its push a node stays off Mist until its ZTP lease expires on the ISP server; this design uses a 10-minute lease.
 
@@ -180,4 +182,3 @@ Also set in both profiles (the user confirms them with the plan): ICL on ge-0/0/
 **F4. mgmt-0 unplugged** on both nodes until each passes the push and cold sync checks. ZTP tries DHCP on mgmt-0 first, and factory mgmt-0 has a static address and a DHCP server.
 
 **F5. Power-on**: who powers on both nodes (named by serial) and tells you the time; you record it in UTC as T0. You start `watch.py` just before power-on, so its event search starts 60 s before it. Nobody types on either box.
-- Lands in: `site_readiness.*`, `t0_power_on_utc`, `t0_epoch`, `watch_start_epoch`.

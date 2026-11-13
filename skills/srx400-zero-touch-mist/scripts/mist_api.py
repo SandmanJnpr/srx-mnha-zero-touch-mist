@@ -13,7 +13,7 @@ secret_check().
 Read-only command line (always GET, output redacted):  python3 mist_api.py /self
 (for /self it prints only scope, org_id, name and role of each privileges entry, and their count).
 """
-import json, os, re, sys, urllib.error, urllib.request
+import http.client, json, os, re, sys, urllib.error, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ANS = json.load(open(os.path.join(HERE, 'answers.json')))
@@ -25,8 +25,9 @@ LAST_HEADERS = {}
 def mist(method, path, body=None):
     """One API call. path is relative to /api/v1; a path that starts with /api/v1 (a 'next' link)
     has that prefix removed. Returns (http_status, parsed JSON, or the text when the body is not JSON).
-    An HTTP error body is parsed too when it is JSON. An empty body gives {}. No connection gives
-    (0, reason). The response headers are kept in LAST_HEADERS (see page_total())."""
+    An HTTP error body is parsed too when it is JSON. An empty body gives {}. No connection, a timeout
+    or a dropped connection gives (0, reason); after a write, status 0 means the write may have landed:
+    read back before any retry. The response headers are kept in LAST_HEADERS (see page_total())."""
     global LAST_HEADERS
     if path.startswith('/api/v1/'):
         path = path[len('/api/v1'):]
@@ -35,15 +36,19 @@ def mist(method, path, body=None):
     req = urllib.request.Request(API + path, data=data, method=method, headers={
         'Authorization': 'Token ' + token, 'Content-Type': 'application/json'})
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            LAST_HEADERS = {k.lower(): v for k, v in r.headers.items()}
-            return r.status, _parse(r.read())
-    except urllib.error.HTTPError as e:
-        LAST_HEADERS = {k.lower(): v for k, v in e.headers.items()} if e.headers else {}
-        return e.code, _parse(e.read())
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                LAST_HEADERS = {k.lower(): v for k, v in r.headers.items()}
+                return r.status, _parse(r.read())
+        except urllib.error.HTTPError as e:
+            LAST_HEADERS = {k.lower(): v for k, v in e.headers.items()} if e.headers else {}
+            return e.code, _parse(e.read())
     except urllib.error.URLError as e:
         LAST_HEADERS = {}
         return 0, str(e.reason)
+    except (OSError, http.client.HTTPException) as e:   # read timeout, connection reset or dropped
+        LAST_HEADERS = {}
+        return 0, '%s: %s' % (type(e).__name__, e)
 
 
 def _parse(raw):
@@ -138,7 +143,8 @@ PROFILE_WRITE = re.compile(r'/orgs/[^/]+/deviceprofiles(/[^/]+)?')
 def write(method, path, body, secrets=()):
     """One write the user has just approved. Prints only the HTTP status, the id and name of the stored
     object (or the assign result), never the object: a stored Hub Profile holds the root hash and the
-    license key. On an error (status 0 = no connection) it prints safe_error(); a profile create or
+    license key. On an error (status 0 = no answer: the write may have landed, read back before any
+    retry) it prints safe_error(); a profile create or
     update without `secrets` prints only the error length. A 2xx body that is not JSON prints only its
     length. Returns (http_status, raw response); keep the raw response in memory only."""
     status, out = mist(method, path, body)
@@ -234,7 +240,7 @@ if __name__ == '__main__':
         print('privileges=%d' % len(privs))
         print(json.dumps(privs, indent=1))
     elif '/config_cmd' in base:
-        print(json.dumps({'cli_lines': len(out.get('cli', [])), '_errors': out.get('_errors')}))
+        print(json.dumps({'cli_lines': len(out.get('cli', [])), '_errors': redact(out.get('_errors'))}))
     elif '/deviceprofiles' in base:
         rows = out if isinstance(out, list) else [out]
         print(json.dumps([profile_summary(p) for p in rows], indent=1))
