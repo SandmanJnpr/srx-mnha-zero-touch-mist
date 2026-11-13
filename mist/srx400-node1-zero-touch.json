@@ -1,0 +1,482 @@
+{
+  "port_config": {
+    "ge-0/0/2": {
+      "name": "wan",
+      "usage": "wan",
+      "aggregated": false,
+      "redundant": false,
+      "critical": false,
+      "disabled": false,
+      "wan_speedtest_mode": "enabled",
+      "wan_type": "broadband",
+      "ip_config": {
+        "type": "dhcp",
+        "type6": "dhcp"
+      },
+      "disable_autoneg": false,
+      "wan_source_nat": {
+        "disabled": false
+      },
+      "wan_networks": [],
+      "wan_probe_override": {
+        "probe_profile": "broadband"
+      },
+      "vpn_paths": {
+        "HUB-wan.OrgOverlay": {
+          "role": "spoke",
+          "bfd_profile": "broadband"
+        }
+      }
+    },
+    "ge-0/0/3": {
+      "networks": [
+        "CORP",
+        "GUEST",
+        "MEDIA",
+        "SECURITY",
+        "IOT"
+      ],
+      "port_network": "MGMT",
+      "usage": "lan",
+      "aggregated": true,
+      "ae_disable_lacp": false,
+      "ae_lacp_force_up": false,
+      "redundant": false,
+      "critical": false,
+      "disabled": false
+    },
+    "ge-0/0/5": {
+      "usage": "lan",
+      "port_network": "ICD",
+      "networks": [],
+      "aggregated": false,
+      "redundant": false,
+      "critical": false,
+      "disabled": false,
+      "description": "inter-node transit link to SRX400-2"
+    }
+  },
+  "ip_configs": {
+    "MGMT": {
+      "type": "static",
+      "ip": "10.10.10.2",
+      "netmask": "/24"
+    },
+    "CORP": {
+      "type": "static",
+      "ip": "10.10.20.2",
+      "netmask": "/24"
+    },
+    "GUEST": {
+      "type": "static",
+      "ip": "10.10.30.2",
+      "netmask": "/24"
+    },
+    "MEDIA": {
+      "type": "static",
+      "ip": "10.10.40.2",
+      "netmask": "/24"
+    },
+    "SECURITY": {
+      "type": "static",
+      "ip": "10.10.50.2",
+      "netmask": "/24"
+    },
+    "IOT": {
+      "type": "static",
+      "ip": "10.10.60.2",
+      "netmask": "/24"
+    },
+    "ICD": {
+      "type": "static",
+      "ip": "10.255.2.1",
+      "netmask": "/30"
+    }
+  },
+  "dhcpd_config": {
+    "enabled": true,
+    "CORP": {
+      "type": "local",
+      "ip_start": "10.10.20.10",
+      "ip_end": "10.10.20.200",
+      "gateway": "10.10.20.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ],
+      "options": {},
+      "lease_time": 86400,
+      "fixed_bindings": {}
+    },
+    "GUEST": {
+      "type": "local",
+      "ip_start": "10.10.30.10",
+      "ip_end": "10.10.30.200",
+      "gateway": "10.10.30.1",
+      "dns_servers": [
+        "1.1.1.1",
+        "8.8.8.8"
+      ],
+      "options": {},
+      "lease_time": 86400,
+      "fixed_bindings": {}
+    },
+    "MGMT": {
+      "type": "local",
+      "ip_start": "10.10.10.10",
+      "ip_end": "10.10.10.200",
+      "gateway": "10.10.10.1",
+      "dns_servers": [
+        "1.1.1.1",
+        "8.8.8.8"
+      ],
+      "options": {},
+      "lease_time": 86400,
+      "fixed_bindings": {}
+    },
+    "MEDIA": {
+      "type": "local",
+      "ip_start": "10.10.40.10",
+      "ip_end": "10.10.40.200",
+      "gateway": "10.10.40.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ],
+      "options": {},
+      "lease_time": 86400,
+      "fixed_bindings": {}
+    },
+    "SECURITY": {
+      "type": "local",
+      "ip_start": "10.10.50.10",
+      "ip_end": "10.10.50.200",
+      "gateway": "10.10.50.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ],
+      "options": {},
+      "lease_time": 86400,
+      "fixed_bindings": {}
+    },
+    "IOT": {
+      "type": "local",
+      "ip_start": "10.10.60.10",
+      "ip_end": "10.10.60.200",
+      "gateway": "10.10.60.1",
+      "dns_servers": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ],
+      "options": {},
+      "lease_time": 86400,
+      "fixed_bindings": {}
+    }
+  },
+  "path_preferences": {
+    "wan": {
+      "strategy": "ordered",
+      "paths": [
+        {
+          "type": "wan",
+          "name": "wan"
+        }
+      ]
+    },
+    "ICD": {
+      "strategy": "ordered",
+      "paths": [
+        {
+          "type": "local",
+          "networks": [
+            "ICD"
+          ]
+        }
+      ]
+    },
+    "OrgOverlay": {
+      "strategy": "ordered",
+      "paths": [
+        {
+          "type": "vpn",
+          "name": "HUB-wan.OrgOverlay"
+        }
+      ]
+    }
+  },
+  "service_policies": [
+    {
+      "name": "allow-to-hub",
+      "tenants": [
+        "IOT"
+      ],
+      "services": [
+        "HUB-SITE-NETS"
+      ],
+      "action": "allow",
+      "path_preference": "OrgOverlay",
+      "idp": {
+        "enabled": false
+      }
+    },
+    {
+      "name": "Internet",
+      "tenants": [
+        "CORP",
+        "GUEST",
+        "MGMT",
+        "MEDIA",
+        "SECURITY",
+        "IOT"
+      ],
+      "services": [
+        "any"
+      ],
+      "action": "allow",
+      "path_preference": "wan",
+      "idp": {
+        "enabled": false
+      }
+    },
+    {
+      "name": "To-ICD",
+      "tenants": [
+        "MGMT",
+        "CORP",
+        "GUEST",
+        "MEDIA",
+        "SECURITY",
+        "IOT"
+      ],
+      "services": [
+        "any"
+      ],
+      "action": "allow",
+      "path_preference": "ICD",
+      "idp": {
+        "enabled": false
+      }
+    },
+    {
+      "name": "ICD-Internet",
+      "tenants": [
+        "ICD"
+      ],
+      "services": [
+        "any"
+      ],
+      "action": "allow",
+      "path_preference": "wan",
+      "idp": {
+        "enabled": false
+      }
+    }
+  ],
+  "ospf_areas": {},
+  "bgp_config": {
+    "ICD": {
+      "via": "lan",
+      "type": "external",
+      "local_as": "65001",
+      "networks": [
+        "ICD"
+      ],
+      "neighbors": {
+        "10.255.2.2": {
+          "neighbor_as": "65002"
+        }
+      },
+      "import_policy": "ICD-IMPORT",
+      "export_policy": "ICD-EXPORT"
+    }
+  },
+  "routing_policies": {
+    "ICD-EXPORT": {
+      "terms": [
+        {
+          "matching": {
+            "prefix": [
+              "0.0.0.0/0"
+            ]
+          },
+          "actions": {
+            "accept": true
+          }
+        }
+      ]
+    },
+    "ICD-IMPORT": {
+      "terms": [
+        {
+          "matching": {
+            "prefix": [
+              "0.0.0.0/0"
+            ]
+          },
+          "actions": {
+            "accept": true
+          }
+        }
+      ]
+    }
+  },
+  "gateway_mgmt": {
+    "host_out_policies": {},
+    "host_in_policies": {},
+    "overlay_ip": {}
+  },
+  "vrf_instances": {},
+  "tunnel_configs": {},
+  "oob_ip_config": {
+    "type": "static",
+    "ip": "<NODE1-MGMT-IP>",
+    "netmask": "/24",
+    "use_mgmt_vrf": false
+  },
+  "ntp_servers": [
+    "pool.ntp.org"
+  ],
+  "dns_servers": [
+    "8.8.8.8",
+    "1.1.1.1"
+  ],
+  "ospf_config": {
+    "enabled": false,
+    "areas": {}
+  },
+  "extra_routes": {},
+  "extra_routes6": {},
+  "additional_config_cmds": [
+    "set security zones security-zone CORP host-inbound-traffic system-services ping",
+    "set security zones security-zone GUEST host-inbound-traffic system-services ping",
+    "set security zones security-zone MEDIA host-inbound-traffic system-services ping",
+    "set security zones security-zone SECURITY host-inbound-traffic system-services ping",
+    "set security zones security-zone IOT host-inbound-traffic system-services ping",
+    "set security zones security-zone MGMT host-inbound-traffic system-services ping",
+    "set security zones security-zone MGMT host-inbound-traffic system-services ssh",
+    "set routing-instances lan system services dhcp-local-server overrides no-unicast-replies",
+    "set system services ssh protocol-version v2",
+    "set chassis high-availability local-id 1",
+    "set chassis high-availability local-id local-ip 10.255.0.1",
+    "set chassis high-availability local-id local-forwarding-ip 10.255.1.1",
+    "set chassis high-availability peer-id 2 peer-ip 10.255.0.2",
+    "set chassis high-availability peer-id 2 interface ge-0/0/4.0",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip 10.255.1.2",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip interface ge-0/0/4.0",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip liveness-detection minimum-interval 1000",
+    "set chassis high-availability peer-id 2 peer-forwarding-ip liveness-detection multiplier 3",
+    "set chassis high-availability peer-id 2 liveness-detection minimum-interval 1000",
+    "set chassis high-availability peer-id 2 liveness-detection multiplier 3",
+    "set chassis high-availability services-redundancy-group 1 deployment-type hybrid",
+    "set chassis high-availability services-redundancy-group 1 peer-id 2",
+    "set chassis high-availability services-redundancy-group 1 active-signal-route 10.255.3.1",
+    "set chassis high-availability services-redundancy-group 1 backup-signal-route 10.255.3.2",
+    "set chassis high-availability services-redundancy-group 1 activeness-priority 200",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 1 ip 10.10.10.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 1 interface ae0.0",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 1 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 2 ip 10.10.20.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 2 interface ae0.20",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 2 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 3 ip 10.10.30.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 3 interface ae0.30",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 3 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 4 ip 10.10.40.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 4 interface ae0.40",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 4 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 5 ip 10.10.50.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 5 interface ae0.50",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 5 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 6 ip 10.10.60.1/24",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 6 interface ae0.60",
+    "set chassis high-availability services-redundancy-group 1 virtual-ip 6 use-virtual-mac",
+    "set chassis high-availability services-redundancy-group 1 monitor interface ae0",
+    "set chassis high-availability services-redundancy-group 1 managed-services dhcp",
+    "set interfaces ge-0/0/4 description \"MNHA ICL to SRX400-2\"",
+    "set interfaces ge-0/0/4 unit 0 family inet address 10.255.0.1/30",
+    "set interfaces lo0 unit 0 family inet address 10.255.1.1/32",
+    "set routing-options static route 10.255.1.2/32 next-hop 10.255.0.2",
+    "set security zones security-zone HA interfaces ge-0/0/4.0 host-inbound-traffic system-services all",
+    "set security zones security-zone HA interfaces ge-0/0/4.0 host-inbound-traffic protocols all",
+    "set security zones security-zone HA interfaces lo0.0 host-inbound-traffic system-services all",
+    "set security zones security-zone HA interfaces lo0.0 host-inbound-traffic protocols all",
+    "set security policies from-zone HA to-zone HA policy allow-ha match source-address any",
+    "set security policies from-zone HA to-zone HA policy allow-ha match destination-address any",
+    "set security policies from-zone HA to-zone HA policy allow-ha match application any",
+    "set security policies from-zone HA to-zone HA policy allow-ha then permit",
+    "delete apply-groups apbr",
+    "set routing-instances XNODE instance-type forwarding",
+    "set routing-instances XNODE routing-options static route 0.0.0.0/0 next-table inet.0",
+    "set routing-instances XNODE routing-options static route 0.0.0.0/0 preference 200",
+    "set routing-options rib-groups ICD-RIB import-rib [ lan.inet.0 XNODE.inet.0 ]",
+    "set firewall family inet filter TO-PEER-ISP term to-peer from source-address 10.10.30.0/24",
+    "set firewall family inet filter TO-PEER-ISP term to-peer from destination-address 0.0.0.0/0",
+    "set firewall family inet filter TO-PEER-ISP term to-peer from destination-address 10.0.0.0/8 except",
+    "set firewall family inet filter TO-PEER-ISP term to-peer from destination-address 172.16.0.0/12 except",
+    "set firewall family inet filter TO-PEER-ISP term to-peer from destination-address 192.168.0.0/16 except",
+    "set firewall family inet filter TO-PEER-ISP term to-peer from destination-address 224.0.0.0/4 except",
+    "set firewall family inet filter TO-PEER-ISP term to-peer from destination-address 255.255.255.255/32 except",
+    "set firewall family inet filter TO-PEER-ISP term to-peer then count to-peer",
+    "set firewall family inet filter TO-PEER-ISP term to-peer then routing-instance XNODE",
+    "set firewall family inet filter TO-PEER-ISP term rest then accept",
+    "set interfaces ae0 unit 30 family inet filter input TO-PEER-ISP",
+    "set security nat source rule-set LAN_to_ICD from zone MGMT",
+    "set security nat source rule-set LAN_to_ICD from zone CORP",
+    "set security nat source rule-set LAN_to_ICD from zone GUEST",
+    "set security nat source rule-set LAN_to_ICD from zone MEDIA",
+    "set security nat source rule-set LAN_to_ICD from zone SECURITY",
+    "set security nat source rule-set LAN_to_ICD from zone IOT",
+    "set security nat source rule-set LAN_to_ICD to zone ICD",
+    "set security nat source rule-set LAN_to_ICD rule xnode_lan match source-address 0.0.0.0/0",
+    "set security nat source rule-set LAN_to_ICD rule xnode_lan then source-nat interface",
+    "set routing-instances lan protocols bgp group ICD family inet unicast rib-group ICD-RIB",
+    "set routing-instances lan system services dhcp-local-server active-leasequery peer-address 10.10.10.3",
+    "set routing-instances lan system services dhcp-local-server active-leasequery timeout 60",
+    "set routing-instances lan system services dhcp-local-server active-leasequery idle-timeout 10",
+    "set system processes dhcp-service accept-max-tcp-connections 100",
+    "set system processes dhcp-service request-max-tcp-connections 100",
+    "set system processes dhcp-service max-leasequery-reply-packet-retries 40",
+    "set system processes dhcp-service leasequery-reply-packet-retry-timer 20",
+    "set system processes dhcp-service max-leasequery-reply-packet-process 500",
+    "set chassis alarm management-ethernet link-down ignore",
+    "set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client client-ia-type ia-pd",
+    "set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client prefix-delegating preferred-prefix-length 60",
+    "set interfaces ae0 unit 0 family inet6 address 2001:db8:2000:1::2/64",
+    "set interfaces ae0 unit 20 family inet6 address 2001:db8:2000:2::2/64",
+    "set interfaces ae0 unit 40 family inet6 address 2001:db8:2000:4::2/64",
+    "set interfaces ae0 unit 50 family inet6 address 2001:db8:2000:5::2/64",
+    "set interfaces ae0 unit 60 family inet6 address 2001:db8:2000:6::2/64",
+    "set protocols router-advertisement interface ae0.0 prefix 2001:db8:2000:1::/64",
+    "set protocols router-advertisement interface ae0.20 prefix 2001:db8:2000:2::/64",
+    "set protocols router-advertisement interface ae0.40 prefix 2001:db8:2000:4::/64",
+    "set protocols router-advertisement interface ae0.50 prefix 2001:db8:2000:5::/64",
+    "set protocols router-advertisement interface ae0.60 prefix 2001:db8:2000:6::/64",
+    "set routing-options rib inet6.0 static route 2001:db8:2000::/60 discard",
+    "set security policies from-zone MGMT to-zone wan policy 01_Internet match source-address any-ipv6",
+    "set security policies from-zone CORP to-zone wan policy 01_Internet match source-address any-ipv6",
+    "set security policies from-zone MEDIA to-zone wan policy 01_Internet match source-address any-ipv6",
+    "set security policies from-zone SECURITY to-zone wan policy 01_Internet match source-address any-ipv6",
+    "set security policies from-zone IOT to-zone wan policy 01_Internet match source-address any-ipv6",
+    "set groups MNHA-NODE-LOCAL security ike gateway <*_to_*> node-local",
+    "set apply-groups MNHA-NODE-LOCAL",
+    "delete security ike gateway wan_to_<hub-MAC>_wan dead-peer-detection optimized",
+    "set security ike gateway wan_to_<hub-MAC>_wan dead-peer-detection always-send",
+    "set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection minimum-interval 1000",
+    "set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay bfd-liveness-detection multiplier 3",
+    "set policy-options condition MNHA-ACTIVE if-route-exists address-family inet 10.255.3.1/32",
+    "set policy-options condition MNHA-ACTIVE if-route-exists address-family inet table inet.0",
+    "set policy-options policy-statement IOT-LP term active from condition MNHA-ACTIVE",
+    "set policy-options policy-statement IOT-LP term active then local-preference 200",
+    "set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay export IOT-LP",
+    "set routing-instances vpn_OrgOverlay protocols bgp group OrgOverlay_overlay export OrgOverlay_advertise",
+    "set interfaces ge-0/0/2 unit 0 family inet6 dhcpv6-client retransmission-attempt 50000",
+    "set system root-authentication encrypted-password \"<ROOT-PASSWORD-HASH>\"",
+    "set interfaces ge-0/0/2 unit 0 family inet dhcp retransmission-attempt 50000",
+    "set interfaces ge-0/0/2 unit 0 family inet dhcp retransmission-interval 64",
+    "set interfaces ge-0/0/2 unit 0 family inet dhcp force-discover"
+  ],
+  "router_id": "",
+  "name": "SZTP-SRX400-NODE1",
+  "type": "gateway"
+}

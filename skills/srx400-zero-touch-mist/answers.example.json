@@ -1,0 +1,74 @@
+{
+  "_about": "Answers file for the srx400-zero-touch-mist skill. Copy to answers.json in a working folder outside the repository clone (mode 600). It holds no secrets: secrets are paths to local files (mode 600). Write mist.portal_host, mist.api_host and mist.token_file first (intake A1-A2): mist_api.py reads them at import. Fields marked 'filled by the agent' come from Mist API reads.",
+  "mist": {
+    "portal_host": "manage.<cloud>.mist.com",
+    "api_host": "api.<cloud>.mist.com",
+    "token_file": "~/mist-api-token",
+    "org_name": "<org name, as GET /self lists it>",
+    "org_id": "<filled by the agent from GET /self>"
+  },
+  "repo_path": "<path of the cloned repository; default two levels above SKILL.md>",
+  "site": {
+    "name": "<branch site name>",
+    "site_id": "<filled by the agent from the inventory>",
+    "timezone": "<filled by the agent from GET /sites/{site_id}>",
+    "auto_upgrade_window": "<filled by the agent from GET /sites/{site_id}/setting, or none>",
+    "oob_mgmt_network": "<out-of-band management network, a /24>"
+  },
+  "nodes": {
+    "1": {
+      "serial": "<node 1 serial>",
+      "role": "ISP 1, MNHA local-id 1, activeness-priority 200, DHCPv6 prefix delegation",
+      "mist_device_name": "<filled by the agent from the inventory, e.g. SRX400-1>",
+      "mac": "<filled by the agent from the inventory, 12 lowercase hex>",
+      "device_id": "<filled by the agent from the inventory>",
+      "mgmt_ip": "<NODE1-MGMT-IP>",
+      "root_hash_file": "~/srx400-zero-touch/<site>/secrets/node1-root-hash",
+      "license_key_file": "<path of node 1's key file, or null for none>",
+      "profile_name": "SZTP-SRX400-NODE1",
+      "profile_id": "<filled by the agent after the create>"
+    },
+    "2": {
+      "serial": "<node 2 serial>",
+      "role": "ISP 2, MNHA local-id 2, activeness-priority 100",
+      "mist_device_name": "<filled by the agent from the inventory, e.g. SRX400-2>",
+      "mac": "<filled by the agent from the inventory, 12 lowercase hex>",
+      "device_id": "<filled by the agent from the inventory>",
+      "mgmt_ip": "<NODE2-MGMT-IP>",
+      "root_hash_file": "~/srx400-zero-touch/<site>/secrets/node2-root-hash",
+      "license_key_file": "<path of node 2's key file, or null for none>",
+      "profile_name": "SZTP-SRX400-NODE2",
+      "profile_id": "<filled by the agent after the create>"
+    }
+  },
+  "hub": {
+    "vpn_name": "OrgOverlay",
+    "path": "HUB-wan",
+    "spoke_path_key": "HUB-wan.OrgOverlay",
+    "hub_profile_name": "<filled by the agent from GET deviceprofiles?type=gateway>",
+    "hub_device_id": "<filled by the agent from the inventory>",
+    "hub_site_id": "<filled by the agent from the inventory>",
+    "hub_mac": "<hub-MAC>",
+    "import_accepts_iot": "<yes|no: hub overlay import accepts 10.10.60.0/24>",
+    "iot_prefix_unique_on_overlay": "<yes|no: no other site advertises 10.10.60.0/24 over OrgOverlay; asked when IOT or HUB-SITE-NETS is reused>",
+    "site_prefixes": [
+      "10.200.0.0/16"
+    ]
+  },
+  "tenant_plan": "paper section 4.2 and the values of intake E1, unchanged",
+  "ipv6": {
+    "node1_delegated_prefix": "<the /60 ISP 1 delegates; never inside 2001:db8::/32, the documentation range of the file's example>"
+  },
+  "site_readiness": {
+    "release_factory_default": "<yes|no: both nodes on 25.4X300-D30.3, factory default>",
+    "isp_dhcp": "<yes|no: address, default route, DNS, 10-minute lease, no option 143, on both WANs>",
+    "isp1_dhcpv6": "<yes|no: ISP 1 answers DHCPv6 on node 1's ge-0/0/2 with IA_NA and IA_PD and always delegates the /60 above>",
+    "lan_switch": "<yes|no: one LAG per node, LACP active, no force-up, VLAN 10 untagged, 20-60 tagged, bridged>",
+    "cabling": "<yes|no: ge-0/0/2 ISP, ge-0/0/3 LAG, ge-0/0/4 and ge-0/0/5 to the peer's same ports>",
+    "mgmt0_unplugged": "<yes|no>",
+    "device_names_set": "<yes|no>"
+  },
+  "watch_start_epoch": null,
+  "t0_power_on_utc": null,
+  "t0_epoch": null
+}
