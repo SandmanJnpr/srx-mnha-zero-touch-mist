@@ -11,6 +11,7 @@ Zero-touch onboarding of an SRX400 MNHA pair into Juniper Mist, on Junos OS Evol
 | [junos/srx400-node1-zero-touch.set](junos/srx400-node1-zero-touch.set), [junos/srx400-node2-zero-touch.set](junos/srx400-node2-zero-touch.set) | Each node's configuration after zero-touch onboarding, in `display set` form |
 | [skills/srx400-zero-touch-mist/](skills/srx400-zero-touch-mist/) | Agent skill for an LLM agent: it asks for every value the build needs, builds the org objects and both Hub Profiles through the Mist API with your approval at each write, assigns them, then follows the onboarding and the checks of paper section 6 |
 | [docs/Agent-Skill-Overview.pdf](docs/Agent-Skill-Overview.pdf) | One-page overview of the agent skill: what it asks, checks, builds, watches and verifies, the Mist API traps it avoids, and what is proven |
+| [docs/QR-vs-SZTP.pdf](docs/QR-vs-SZTP.pdf) | One-page comparison: the QR code (the claim) and SZTP (the secure bootstrap) are two different jobs in the same onboarding flow |
 
 Values in angle brackets (`<...>`) are placeholders; `<*_to_*>` is a Junos wildcard and stays as is. Before use, replace the placeholders and node 1's example IPv6 /60 `2001:db8:2000::/60`, and change the hub path `HUB-wan.OrgOverlay` and the hub site prefix `10.200.0.0/16` if yours differ (paper sections 7 and 8). Prerequisite: a Mist hub on the OrgOverlay VPN (paper section 7, step 1). Without an agent, follow paper section 7, steps 1 to 16.
 
