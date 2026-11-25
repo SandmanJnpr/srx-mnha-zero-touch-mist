@@ -1,0 +1,7 @@
+# Working-folder files of the agent skill (SKILL.md rule 11): they belong outside the clone.
+answers.json
+plan/
+plan-*/
+secrets/
+watch.log
+watch.pid

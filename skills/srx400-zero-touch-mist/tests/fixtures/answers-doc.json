@@ -1,0 +1,334 @@
+{
+  "_about": "Test fixture for tests/test_build_plan.py: the reference design of ../../mist/srx400-node1-zero-touch.json and srx400-node2-zero-touch.json as answers (schema v2), with documentation values only (RFC 5737 / RFC 1918 addresses, the RFC 3849 IPv6 prefix of the repository files, the RFC 7042 documentation MAC). Secrets are paths to files that the tests never read.",
+  "_fixture": {
+    "allow_documentation_ipv6_prefix": true,
+    "why": "the repository files use the documentation prefix 2001:db8:2000::/60; customers give the prefix their ISP delegates"
+  },
+  "schema": "srx400-zero-touch-mist.answers.v2",
+  "mist": {
+    "portal_host": "manage.mist.com",
+    "api_host": "api.mist.com",
+    "token_file": "~/mist-api-token",
+    "org_name": "<org>",
+    "org_id": "<org-id>",
+    "access": "org-admin"
+  },
+  "repo_path": "../..",
+  "site": {
+    "name": "BRANCH-01",
+    "site_id": "<site-id>",
+    "timezone": "<filled by the agent>",
+    "auto_upgrade_window": null,
+    "gatewaytemplate_id": null
+  },
+  "release": "25.4X300-D30.3-EVO",
+  "profiles_method": "api",
+  "nodes": {
+    "1": {
+      "serial": "EXAMPLE00001",
+      "mist_device_name": "SRX400-1",
+      "mac": "<mac>",
+      "device_id": "<device-id>",
+      "ports": {
+        "wan": "ge-0/0/2",
+        "lan": [
+          "ge-0/0/3"
+        ],
+        "lan_lacp": true,
+        "icl": "ge-0/0/4",
+        "icd": "ge-0/0/5"
+      },
+      "mgmt_ip": "192.168.100.11",
+      "root_hash_file": "~/srx400-zero-touch/BRANCH-01/secrets/node1-root-hash",
+      "root_ssh_key_file": null,
+      "license_key_file": null,
+      "profile_name": "SZTP-SRX400-NODE1",
+      "profile_id": null
+    },
+    "2": {
+      "serial": "EXAMPLE00002",
+      "mist_device_name": "SRX400-2",
+      "mac": "<mac>",
+      "device_id": "<device-id>",
+      "ports": {
+        "wan": "ge-0/0/2",
+        "lan": [
+          "ge-0/0/3"
+        ],
+        "lan_lacp": true,
+        "icl": "ge-0/0/4",
+        "icd": "ge-0/0/5"
+      },
+      "mgmt_ip": "192.168.100.12",
+      "root_hash_file": "~/srx400-zero-touch/BRANCH-01/secrets/node2-root-hash",
+      "root_ssh_key_file": null,
+      "license_key_file": "~/srx400-zero-touch/BRANCH-01/secrets/node2-license-key",
+      "profile_name": "SZTP-SRX400-NODE2",
+      "profile_id": null
+    }
+  },
+  "isps": {
+    "1": {
+      "label": "ISP 1",
+      "handoff": "dhcp-untagged",
+      "wan_subnet": "192.0.2.0/29",
+      "lease_behavior": "held",
+      "lease_seconds": 600,
+      "ipv6_pd": true,
+      "delegated_prefix": "2001:db8:2000::/60",
+      "pd_length": 60,
+      "prefix_stable": "yes"
+    },
+    "2": {
+      "label": "ISP 2",
+      "handoff": "dhcp-untagged",
+      "wan_subnet": "198.51.100.0/29",
+      "lease_behavior": "held",
+      "lease_seconds": 600,
+      "ipv6_pd": false,
+      "delegated_prefix": null,
+      "pd_length": null,
+      "prefix_stable": null
+    },
+    "same_upstream": false
+  },
+  "services": {
+    "dns_servers": [
+      "8.8.8.8",
+      "1.1.1.1"
+    ],
+    "ntp_servers": [
+      "pool.ntp.org"
+    ]
+  },
+  "hub": {
+    "present": true,
+    "vpn_name": "OrgOverlay",
+    "vpn_type": "hub_spoke",
+    "paths": [
+      {
+        "path": "HUB-wan",
+        "hub_profile_name": "HUB",
+        "hub_wan_port_name": "wan",
+        "hub_device_id": "<hub-device-id>",
+        "hub_site_id": "<hub-site-id>",
+        "hub_mac": "00005e005301"
+      }
+    ],
+    "overlay_as": "65000",
+    "site_prefixes": [
+      "10.200.0.0/16"
+    ],
+    "import_accepts_overlay_tenants": "yes",
+    "overlay_tenant_subnets_unique": "yes"
+  },
+  "tenants": [
+    {
+      "name": "MGMT",
+      "vlan_id": 10,
+      "untagged": true,
+      "subnet": "10.10.10.0/24",
+      "gateway": "10.10.10.1",
+      "node_ips": null,
+      "preferred_isp": 1,
+      "internet": true,
+      "ssh": true,
+      "ipv6": "isp1",
+      "ipv6_index": null,
+      "overlay": false,
+      "reach": [],
+      "dhcp": {
+        "mode": "server",
+        "start": "10.10.10.10",
+        "end": "10.10.10.200",
+        "dns_servers": [
+          "1.1.1.1",
+          "8.8.8.8"
+        ],
+        "lease_time": 86400,
+        "dns_suffix": [],
+        "options": {},
+        "fixed_bindings": {},
+        "relay_servers": []
+      }
+    },
+    {
+      "name": "CORP",
+      "vlan_id": 20,
+      "untagged": false,
+      "subnet": "10.10.20.0/24",
+      "gateway": "10.10.20.1",
+      "node_ips": null,
+      "preferred_isp": 1,
+      "internet": true,
+      "ssh": false,
+      "ipv6": "isp1",
+      "ipv6_index": null,
+      "overlay": false,
+      "reach": [],
+      "dhcp": {
+        "mode": "server",
+        "start": "10.10.20.10",
+        "end": "10.10.20.200",
+        "dns_servers": [
+          "8.8.8.8",
+          "1.1.1.1"
+        ],
+        "lease_time": 86400,
+        "dns_suffix": [],
+        "options": {},
+        "fixed_bindings": {},
+        "relay_servers": []
+      }
+    },
+    {
+      "name": "GUEST",
+      "vlan_id": 30,
+      "untagged": false,
+      "subnet": "10.10.30.0/24",
+      "gateway": "10.10.30.1",
+      "node_ips": null,
+      "preferred_isp": 2,
+      "internet": true,
+      "ssh": false,
+      "ipv6": "none",
+      "ipv6_index": null,
+      "overlay": false,
+      "reach": [],
+      "dhcp": {
+        "mode": "server",
+        "start": "10.10.30.10",
+        "end": "10.10.30.200",
+        "dns_servers": [
+          "1.1.1.1",
+          "8.8.8.8"
+        ],
+        "lease_time": 86400,
+        "dns_suffix": [],
+        "options": {},
+        "fixed_bindings": {},
+        "relay_servers": []
+      }
+    },
+    {
+      "name": "MEDIA",
+      "vlan_id": 40,
+      "untagged": false,
+      "subnet": "10.10.40.0/24",
+      "gateway": "10.10.40.1",
+      "node_ips": null,
+      "preferred_isp": 1,
+      "internet": true,
+      "ssh": false,
+      "ipv6": "isp1",
+      "ipv6_index": null,
+      "overlay": false,
+      "reach": [],
+      "dhcp": {
+        "mode": "server",
+        "start": "10.10.40.10",
+        "end": "10.10.40.200",
+        "dns_servers": [
+          "8.8.8.8",
+          "1.1.1.1"
+        ],
+        "lease_time": 86400,
+        "dns_suffix": [],
+        "options": {},
+        "fixed_bindings": {},
+        "relay_servers": []
+      }
+    },
+    {
+      "name": "SECURITY",
+      "vlan_id": 50,
+      "untagged": false,
+      "subnet": "10.10.50.0/24",
+      "gateway": "10.10.50.1",
+      "node_ips": null,
+      "preferred_isp": 1,
+      "internet": true,
+      "ssh": false,
+      "ipv6": "isp1",
+      "ipv6_index": null,
+      "overlay": false,
+      "reach": [],
+      "dhcp": {
+        "mode": "server",
+        "start": "10.10.50.10",
+        "end": "10.10.50.200",
+        "dns_servers": [
+          "8.8.8.8",
+          "1.1.1.1"
+        ],
+        "lease_time": 86400,
+        "dns_suffix": [],
+        "options": {},
+        "fixed_bindings": {},
+        "relay_servers": []
+      }
+    },
+    {
+      "name": "IOT",
+      "vlan_id": 60,
+      "untagged": false,
+      "subnet": "10.10.60.0/24",
+      "gateway": "10.10.60.1",
+      "node_ips": null,
+      "preferred_isp": 1,
+      "internet": true,
+      "ssh": false,
+      "ipv6": "isp1",
+      "ipv6_index": null,
+      "overlay": true,
+      "reach": [],
+      "dhcp": {
+        "mode": "server",
+        "start": "10.10.60.10",
+        "end": "10.10.60.200",
+        "dns_servers": [
+          "8.8.8.8",
+          "1.1.1.1"
+        ],
+        "lease_time": 86400,
+        "dns_suffix": [],
+        "options": {},
+        "fixed_bindings": {},
+        "relay_servers": []
+      }
+    }
+  ],
+  "pair": {
+    "alq_tenant": null,
+    "preemption": false,
+    "icl_encryption": false,
+    "icl_psk_file": null
+  },
+  "mgmt": {
+    "mode": "static",
+    "oob_network": "192.168.100.0/24",
+    "gateway": null
+  },
+  "internal": {
+    "block": "10.255.0.0/16",
+    "icd_asn": {
+      "1": "65001",
+      "2": "65002"
+    }
+  },
+  "site_readiness": {
+    "factory_default": "yes",
+    "isp_dhcp": "yes",
+    "isp1_dhcpv6": "yes",
+    "modem_accepts_new_mac": "yes",
+    "lan_switch": "yes",
+    "cabling": "yes",
+    "mgmt0_unplugged": "yes",
+    "device_names_set": "yes"
+  },
+  "watch": {
+    "watch_start_epoch": null,
+    "t0_power_on_utc": null,
+    "t0_epoch": null
+  }
+}

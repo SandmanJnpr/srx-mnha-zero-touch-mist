@@ -1,0 +1,135 @@
+[
+  {
+    "step": 1,
+    "method": "POST",
+    "path": "/orgs/{org_id}/networks",
+    "body": {
+      "name": "MGMT",
+      "vlan_id": 10,
+      "subnet": "10.10.10.0/24",
+      "gateway": "10.10.10.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    }
+  },
+  {
+    "step": 2,
+    "method": "POST",
+    "path": "/orgs/{org_id}/networks",
+    "body": {
+      "name": "CORP",
+      "vlan_id": 20,
+      "subnet": "10.10.20.0/24",
+      "gateway": "10.10.20.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    }
+  },
+  {
+    "step": 3,
+    "method": "POST",
+    "path": "/orgs/{org_id}/networks",
+    "body": {
+      "name": "GUEST",
+      "vlan_id": 30,
+      "subnet": "10.10.30.0/24",
+      "gateway": "10.10.30.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    }
+  },
+  {
+    "step": 4,
+    "method": "POST",
+    "path": "/orgs/{org_id}/networks",
+    "body": {
+      "name": "MEDIA",
+      "vlan_id": 40,
+      "subnet": "10.10.40.0/24",
+      "gateway": "10.10.40.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    }
+  },
+  {
+    "step": 5,
+    "method": "POST",
+    "path": "/orgs/{org_id}/networks",
+    "body": {
+      "name": "SECURITY",
+      "vlan_id": 50,
+      "subnet": "10.10.50.0/24",
+      "gateway": "10.10.50.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      }
+    }
+  },
+  {
+    "step": 6,
+    "method": "POST",
+    "path": "/orgs/{org_id}/networks",
+    "body": {
+      "name": "IOT",
+      "vlan_id": 60,
+      "subnet": "10.10.60.0/24",
+      "gateway": "10.10.60.1",
+      "internet_access": {
+        "enabled": true,
+        "restricted": false,
+        "create_simple_service_policy": false
+      },
+      "vpn_access": {
+        "OrgOverlay": {
+          "routed": true,
+          "no_readvertise_to_overlay": true
+        }
+      }
+    }
+  },
+  {
+    "step": 7,
+    "method": "POST",
+    "path": "/orgs/{org_id}/networks",
+    "body": {
+      "name": "ICD",
+      "subnet": "10.255.2.0/30",
+      "disallow_mist_services": true,
+      "internet_access": {
+        "enabled": false
+      }
+    }
+  },
+  {
+    "step": 8,
+    "method": "POST",
+    "path": "/orgs/{org_id}/services",
+    "body": {
+      "name": "HUB-SITE-NETS",
+      "type": "custom",
+      "addresses": [
+        "10.200.0.0/16"
+      ],
+      "specs": [
+        {
+          "protocol": "any",
+          "port_range": "0"
+        }
+      ]
+    }
+  }
+]
